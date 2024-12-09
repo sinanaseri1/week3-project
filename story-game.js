@@ -15,12 +15,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const playerSprite = new Image();
   playerSprite.src = "samurai.png";
 
+  // Predefined positions for each location
+  const locationPositions = {
+    castle: { x: 100, y: 100 },
+    village: { x: 200, y: 200 },
+    harbor: { x: 300, y: 150 },
+    forest: { x: 400, y: 250 },
+    shrine: { x: 500, y: 100 },
+    battlefield: { x: 600, y: 300 },
+  };
+
   const initialState = {
-    x: 100,
-    y: 100,
-    width: 64, // Larger size for visibility
+    x: locationPositions.castle.x,
+    y: locationPositions.castle.y,
+    width: 64,
     height: 64,
     location: "castle",
+    visitedLocations: [],
     status: "neutral",
   };
 
@@ -117,6 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const loc = locations[location];
     storyText.textContent = `You are at ${loc.name}. ${loc.description}`;
     moveBtn.classList.remove("hidden");
+    // Always allow interacting for now
     interactBtn.classList.remove("hidden");
     challengeSection.classList.add("hidden");
   }
@@ -138,8 +150,21 @@ document.addEventListener("DOMContentLoaded", () => {
         const newLocation = e.target.dataset.location;
         player.location = newLocation;
 
-        player.x = Math.random() * canvas.width; // Change to defined positions if needed
-        player.y = Math.random() * canvas.height;
+        if (!player.visitedLocations.includes(newLocation)) {
+          player.visitedLocations.push(newLocation);
+        }
+
+        // Check win condition
+        if (player.visitedLocations.length === Object.keys(locations).length) {
+          storyText.textContent =
+            "Congratulations! You have visited all locations and won the game!";
+          moveBtn.classList.add("hidden");
+          interactBtn.classList.add("hidden");
+          return;
+        }
+
+        player.x = locationPositions[newLocation].x;
+        player.y = locationPositions[newLocation].y;
 
         updateStory(newLocation);
         draw();
@@ -174,30 +199,38 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (outcome === "progress") {
       storyText.textContent = "You navigated the challenge successfully but more lies ahead.";
     } else {
-      storyText.textContent = "You made the wrong choice and lost the game. Reset to try again.";
-      moveBtn.classList.add("hidden");
-      interactBtn.classList.add("hidden");
+      // Instead of blocking the player from continuing, just show a message but keep buttons visible
+      storyText.textContent = "You made a poor choice this time. You may continue traveling and try again elsewhere.";
+      
+      // Do NOT hide the move or interact buttons here.
+      // moveBtn.classList.add("hidden");
+      // interactBtn.classList.add("hidden");
     }
-
+  
     challengeSection.classList.add("hidden");
   }
+  
 
   function resetGame() {
-    player = { ...initialState }; // Reset player to initial state
-    storyText.textContent = "Choose your starting location to begin your journey.";
-    moveBtn.classList.add("hidden"); // Hide the move button
-    interactBtn.classList.add("hidden"); // Hide the interact button
-    challengeSection.classList.add("hidden"); // Hide the challenge section
-    draw(); // Redraw the map and character
+    // CHANGES MADE HERE: Fully restore the initial state and show the story again.
+    player = { ...initialState };
+    // Update the story and show the initial location's details again
+    updateStory(player.location);
+    moveBtn.classList.remove("hidden");
+    interactBtn.classList.remove("hidden");
+    challengeSection.classList.add("hidden");
+    draw();
   }
-  
-  
 
   moveBtn.addEventListener("click", movePlayer);
   interactBtn.addEventListener("click", () => showChallenge(player.location));
   resetBtn.addEventListener("click", resetGame);
 
-  updateStory(player.location);
-  draw();
+  // CHANGES MADE HERE: Wait for images to load before drawing the initial scene
+  mapImage.onload = () => {
+    playerSprite.onload = () => {
+      updateStory(player.location);
+      draw();
+    };
+  };
 });
-
