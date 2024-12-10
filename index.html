@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Samurai Adventure - Story Mode</title>
     <script src="story-game.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -27,12 +27,15 @@
         <div id="choices" class="mt-2 space-x-2"></div>
       </div>
 
-      <div id="location-input-section" class="mt-4 bg-gray-700 p-4 rounded-lg hidden">
+      <div
+        id="location-input-section"
+        class="mt-4 bg-gray-700 p-4 rounded-lg hidden"
+      >
         <p>Type the location you want to go to:</p>
         <input
           type="text"
           id="location-input"
-          class="bg-gray-800 text-white p-2 rounded-lg"
+          class="bg-gray-800 text-white p-2 rounded-lg border-2 border-transparent"
           placeholder="Enter location name"
         />
         <button
@@ -41,13 +44,21 @@
         >
           Go
         </button>
-        <p id="location-error" class="text-red-500 hidden">Invalid location. Try again.</p>
+        <p id="location-error" class="text-red-500 hidden">
+          Invalid location. Try again.
+        </p>
       </div>
 
-      <!-- NEW: Persistent Available Locations Section -->
+      <!-- Persistent Available Locations Section -->
       <div id="available-locations" class="mt-4 bg-gray-700 p-4 rounded-lg">
         <h2 class="text-xl font-bold mb-2">Available Locations:</h2>
         <p id="available-locations-list" class="text-white"></p>
+      </div>
+
+      <!-- Progress Section for Clues -->
+      <div id="progress-section" class="mt-4 bg-gray-700 p-4 rounded-lg">
+        <h2 class="text-xl font-bold mb-2">Progress:</h2>
+        <p id="progress-text">Clues Found: 0/6</p>
       </div>
 
       <!-- Interaction and Story -->
@@ -56,7 +67,6 @@
           Choose your starting location to begin your journey.
         </p>
         <div id="actions" class="mt-2">
-          <!-- Removed the move button, only Interact and Reset remain -->
           <button
             class="action-btn bg-green-600 hover:bg-green-700 p-2 rounded-lg hidden"
             id="interact-btn"
@@ -71,6 +81,9 @@
           </button>
         </div>
       </div>
+
+      <!-- Background Music -->
+      <audio id="bg-music" src="ambient.mp3" loop></audio>
     </div>
   </body>
 </html>
