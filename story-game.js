@@ -2,12 +2,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("game-canvas");
   const ctx = canvas.getContext("2d");
   const storyText = document.getElementById("story-text");
-  const moveBtn = document.getElementById("move-btn");
   const interactBtn = document.getElementById("interact-btn");
   const resetBtn = document.getElementById("reset-btn");
   const challengeSection = document.getElementById("challenge-section");
   const challengeText = document.getElementById("challenge-text");
   const choicesContainer = document.getElementById("choices");
+
+  const locationInputSection = document.getElementById(
+    "location-input-section"
+  );
+  const locationInput = document.getElementById("location-input");
+  const submitLocationBtn = document.getElementById("submit-location-btn");
+  const locationError = document.getElementById("location-error");
+
+  const availableLocationsBox = document.getElementById("available-locations");
+  const availableLocationsList = document.getElementById(
+    "available-locations-list"
+  );
 
   const mapImage = new Image();
   mapImage.src = "map.png";
@@ -52,10 +63,10 @@ document.addEventListener("DOMContentLoaded", () => {
     shrine: {
       name: "Crumbling Shrine",
       description:
-        "Long ago, your father’s kingdom touched these sacred grounds. Now the shrine stands in quiet disrepair. A monk here claims to have seen the assassin fleeing the night your father fell.",
+        "Long ago, your father’s kingdom touched these sacred grounds...",
       connections: ["harbor"],
       challenge: {
-        text: "A trembling monk speaks: 'I saw a hooded figure after your father was murdered. He left a strange talisman behind. Show humility, and I’ll share what I know.'",
+        text: "A trembling monk speaks: ...",
         choices: [
           { text: "Kneel and Pray for Guidance (win)", outcome: "win" },
           {
@@ -68,11 +79,10 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     harbor: {
       name: "Kurokumo Harbor",
-      description:
-        "Ships creak under faded sails. Rumor has it the assassin fled by sea. A merchant might hold a bloodstained scrap the killer left behind.",
+      description: "Ships creak under faded sails...",
       connections: ["castle", "shrine"],
       challenge: {
-        text: "A weathered merchant eyes you: 'The killer sailed from here. He left a scrap of royal cloth. Earn my trust, and it’s yours.'",
+        text: "A weathered merchant eyes you: ...",
         choices: [
           { text: "Trade Fairly (win)", outcome: "win" },
           { text: "Haggle Hard (progress)", outcome: "progress" },
@@ -82,56 +92,49 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     castle: {
       name: "Ruined Castle",
-      description:
-        "Your father’s old keep lies in ruins. An old servant might recall the assassin’s words. Perhaps a letter or clue remains in the shattered halls.",
+      description: "Your father’s old keep lies in ruins...",
       connections: ["village", "harbor"],
       challenge: {
-        text: "A loyal servant appears: 'The killer cursed your father’s name and spoke of revenge. Help me bury the guards, and I’ll give you a letter he dropped.'",
+        text: "A loyal servant appears: ...",
         choices: [
           { text: "Honor the Fallen (win)", outcome: "win" },
-          {
-            text: "Pay the Servant for the Letter (progress)",
-            outcome: "progress",
-          },
+          { text: "Pay the Servant (progress)", outcome: "progress" },
           { text: "Demand the Letter (lose)", outcome: "lose" },
         ],
       },
     },
     village: {
       name: "Kiyama Village",
-      description:
-        "This quiet place remembers the assassin. He once lived here, grieving losses blamed on the king’s guards. A villager might share what they overheard.",
+      description: "This quiet place remembers the assassin...",
       connections: ["castle", "forest"],
       challenge: {
-        text: "A fearful villager clutches a pendant: 'The killer cried by our well, mourning murdered kin. Show kindness, and I’ll tell you what he said that night.'",
+        text: "A fearful villager clutches a pendant: ...",
         choices: [
           { text: "Offer Comfort (win)", outcome: "win" },
-          { text: "Pay for Their Silence (progress)", outcome: "progress" },
-          { text: "Intimidate the Villager (lose)", outcome: "lose" },
+          { text: "Pay for Silence (progress)", outcome: "progress" },
+          { text: "Intimidate (lose)", outcome: "lose" },
         ],
       },
     },
     forest: {
       name: "Bamboo Forest",
-      description:
-        "In the whispering bamboo, the assassin hid his sorrows. A spirit here might reveal a doll’s fragment he left behind, symbolizing lost innocence.",
+      description: "In the whispering bamboo...",
       connections: ["village", "battlefield"],
       challenge: {
-        text: "A spirit’s voice drifts in the bamboo: 'He lost everything and carried a child’s doll fragment. Show reverence, and I shall guide you to it.'",
+        text: "A spirit’s voice drifts in the bamboo: ...",
         choices: [
           { text: "Offer a Prayer (win)", outcome: "win" },
-          { text: "Leave a Coin as Tribute (progress)", outcome: "progress" },
+          { text: "Leave a Coin (progress)", outcome: "progress" },
           { text: "Curse the Forest (lose)", outcome: "lose" },
         ],
       },
     },
     battlefield: {
       name: "Crimson Battlefield",
-      description:
-        "A scarred field of old wars. The killer vowed vengeance here. A ghost may reveal his true face, if you earn its trust.",
+      description: "A scarred field of old wars...",
       connections: ["forest"],
       challenge: {
-        text: "A specter hovers: 'He swore your father would know his pain. Show respect for the dead, and I’ll name the killer you seek.'",
+        text: "A specter hovers: ...",
         choices: [
           { text: "Bow to the Fallen (win)", outcome: "win" },
           { text: "Whisper Vengeance (progress)", outcome: "progress" },
@@ -141,15 +144,14 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     finalboss: {
       name: "Old Cliffside Ruin",
-      description:
-        "With all clues gathered, you track the assassin to a hidden ruin. He stands before you, blade trembling. He knows who you are, and you know why he killed your father.",
+      description: "With all clues gathered...",
       connections: [],
       challenge: {
-        text: "The assassin speaks: 'Your father’s guards slaughtered my family. I killed him so he’d taste my pain. Fight me if you must, but know the truth before drawing blood.'",
+        text: "The assassin speaks: ...",
         choices: [
           { text: "Fight With Honor (win)", outcome: "win" },
           { text: "Ambush Him (progress)", outcome: "progress" },
-          { text: "Hesitate and Let Him Strike (lose)", outcome: "lose" },
+          { text: "Hesitate (lose)", outcome: "lose" },
         ],
       },
     },
@@ -172,7 +174,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateStory(location) {
     const loc = locations[location];
     storyText.textContent = `You are at ${loc.name}. ${loc.description}`;
-    moveBtn.classList.remove("hidden");
 
     if (challengesCompleted[location]) {
       interactBtn.classList.add("hidden");
@@ -181,42 +182,59 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     challengeSection.classList.add("hidden");
+    updateAvailableLocations(loc);
+    showLocationInputIfNeeded(loc);
   }
 
-  function movePlayer() {
-    const loc = locations[player.location];
+  // NEW FUNCTION: Update the separate box with available locations
+  function updateAvailableLocations(loc) {
     const connections = loc.connections;
+    if (connections.length === 0) {
+      availableLocationsList.textContent =
+        "No further locations available from here.";
+    } else {
+      const names = connections.map((c) => locations[c].name).join(", ");
+      availableLocationsList.textContent = names;
+    }
+  }
 
-    if (connections.length === 0 && player.location === "finalboss") {
-      storyText.textContent =
-        "There’s nowhere left to go. Face your destiny here.";
+  function showLocationInputIfNeeded(loc) {
+    const connections = loc.connections;
+    if (connections.length === 0) {
+      locationInputSection.classList.add("hidden");
       return;
     }
 
-    let options = connections
-      .map(
-        (connection) =>
-          `<button class="move-option-btn bg-blue-600 hover:bg-blue-700 p-2 rounded-lg mx-2" data-location="${connection}">${locations[connection].name}</button>`
-      )
-      .join("");
-    storyText.innerHTML = `Where do you want to go? ${options}`;
+    locationInputSection.classList.remove("hidden");
+    locationError.classList.add("hidden");
+    locationInput.value = "";
 
-    document.querySelectorAll(".move-option-btn").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        const newLocation = e.target.dataset.location;
-        player.location = newLocation;
+    submitLocationBtn.onclick = () => {
+      const userInput = locationInput.value.trim().toLowerCase();
+      const validLocation = connections.find(
+        (conn) => locations[conn].name.toLowerCase() === userInput
+      );
 
-        if (!player.visitedLocations.includes(newLocation)) {
-          player.visitedLocations.push(newLocation);
-        }
+      if (validLocation) {
+        locationError.classList.add("hidden");
+        handleMove(validLocation);
+      } else {
+        locationError.classList.remove("hidden");
+      }
+    };
+  }
 
-        player.x = locationPositions[newLocation].x;
-        player.y = locationPositions[newLocation].y;
+  function handleMove(newLocation) {
+    player.location = newLocation;
+    if (!player.visitedLocations.includes(newLocation)) {
+      player.visitedLocations.push(newLocation);
+    }
 
-        updateStory(newLocation);
-        draw();
-      });
-    });
+    player.x = locationPositions[newLocation].x;
+    player.y = locationPositions[newLocation].y;
+
+    updateStory(newLocation);
+    draw();
   }
 
   function showChallenge(location) {
@@ -242,7 +260,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function handleChoice(outcome) {
     if (player.location !== "finalboss") {
-      // Main locations
       if (outcome === "win") {
         storyText.textContent =
           "You gain a vital clue. The picture grows clearer.";
@@ -255,29 +272,23 @@ document.addEventListener("DOMContentLoaded", () => {
         storyText.textContent =
           "You fail to secure the clue this time. You can try again later.";
       }
-      // Hide challenge section after normal locations
       challengeSection.classList.add("hidden");
       checkWinCondition();
     } else {
       // Final boss scenario
       if (outcome === "win" || outcome === "progress") {
         storyText.textContent =
-          "You disarm the assassin. He kneels, grief in his eyes. Now choose his fate.";
+          "You disarm the assassin. He kneels. Now choose his fate.";
         markChallengeCompleted("finalboss");
-
-        // CHANGES HERE: Do NOT hide the challenge section. Directly call showFinalChoice()
-        // Also, hide move and interact buttons to focus player on final choice
-        moveBtn.classList.add("hidden");
+        locationInputSection.classList.add("hidden");
         interactBtn.classList.add("hidden");
-
-        // Now show the final moral choices
         showFinalChoice();
       } else {
         storyText.textContent =
-          "Your hesitation proves fatal. The assassin deals a deadly blow.";
-        moveBtn.classList.add("hidden");
+          "Your hesitation proves fatal. The assassin strikes you down.";
         interactBtn.classList.add("hidden");
         challengeSection.classList.add("hidden");
+        locationInputSection.classList.add("hidden");
       }
     }
   }
@@ -300,22 +311,19 @@ document.addEventListener("DOMContentLoaded", () => {
       (loc) => challengesCompleted[loc]
     );
 
-    // Once all main clues are gathered, unlock the final boss if not already done
     if (allMainCompleted && !challengesCompleted.finalboss) {
-      // Add finalboss to battlefield if not already present
       if (!locations.battlefield.connections.includes("finalboss")) {
         locations.battlefield.connections.push("finalboss");
         storyText.textContent =
-          "All clues are gathered! Return to the Battlefield and follow the hidden path to face the assassin.";
+          "All clues gathered! Return to the Battlefield to face the assassin.";
+        updateAvailableLocations(locations[player.location]);
       }
     }
   }
 
   function showFinalChoice() {
-    storyText.textContent =
-      "The assassin reveals your father’s guards killed his family. He sought revenge. Will you kill, spare, or imprison him?";
+    challengeSection.classList.remove("hidden");
     challengeText.textContent = "Your final decision:";
-
     choicesContainer.innerHTML = "";
 
     const finalChoices = [
@@ -332,26 +340,21 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.addEventListener("click", () => handleFinalChoice(choice.outcome));
       choicesContainer.appendChild(btn);
     });
-
-    // Ensure the challenge section is now visible
-    challengeSection.classList.remove("hidden");
   }
 
   function handleFinalChoice(outcome) {
     challengeSection.classList.add("hidden");
-    moveBtn.classList.add("hidden");
-    interactBtn.classList.add("hidden");
 
     let finalMessage = "";
     if (outcome === "kill") {
       finalMessage =
-        "You deliver the final blow. The assassin’s blood stains your blade, and the cycle of violence continues.";
+        "You deliver the final blow. The cycle of violence continues.";
     } else if (outcome === "spare") {
       finalMessage =
-        "You lower your weapon. The assassin collapses in sobs, released from hatred, and perhaps so are you.";
+        "You lower your weapon. Perhaps there is hope in forgiveness.";
     } else {
       finalMessage =
-        "You bind his hands. Justice, not vengeance, will shape the kingdom’s future.";
+        "You bind his hands. Justice, not vengeance, will shape the future.";
     }
 
     storyText.textContent = finalMessage;
@@ -388,13 +391,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showCharacterSelection() {
-    moveBtn.classList.add("hidden");
     interactBtn.classList.add("hidden");
+    availableLocationsList.textContent = "";
+    locationInputSection.classList.add("hidden");
 
     storyText.innerHTML = `
       <p>You are the heir of a murdered king. Choose your path:</p>
-      <button id="samurai-select" class="bg-green-600 hover:bg-green-700 p-2 rounded-lg mx-2">Samurai (Noble Blade)</button>
-      <button id="ninja-select" class="bg-green-600 hover:bg-green-700 p-2 rounded-lg mx-2">Ninja (Silent Vengeance)</button>
+      <button id="samurai-select" class="bg-green-600 hover:bg-green-700 p-2 rounded-lg mx-2">Samurai</button>
+      <button id="ninja-select" class="bg-green-600 hover:bg-green-700 p-2 rounded-lg mx-2">Ninja</button>
     `;
 
     document.getElementById("samurai-select").addEventListener("click", () => {
@@ -413,9 +417,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function startGame() {
-    updateStory(player.location);
-    moveBtn.classList.remove("hidden");
     interactBtn.classList.remove("hidden");
+    updateStory(player.location);
     draw();
   }
 
@@ -431,7 +434,6 @@ document.addEventListener("DOMContentLoaded", () => {
       finalboss: false,
     };
 
-    // Remove finalboss from battlefield if previously added
     const fbIndex = locations.battlefield.connections.indexOf("finalboss");
     if (fbIndex !== -1) {
       locations.battlefield.connections.splice(fbIndex, 1);
@@ -447,7 +449,6 @@ document.addEventListener("DOMContentLoaded", () => {
     draw();
   }
 
-  moveBtn.addEventListener("click", movePlayer);
   interactBtn.addEventListener("click", () => showChallenge(player.location));
   resetBtn.addEventListener("click", resetGame);
 

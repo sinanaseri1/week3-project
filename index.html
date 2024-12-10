@@ -1,46 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Samurai Adventure - Story Mode</title>
-  <script src="story-game.js" defer></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-800 text-white font-mono">
-  <div class="container mx-auto p-4 text-center">
-    <h1 class="text-3xl font-bold mb-4">Samurai Adventure</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Samurai Adventure - Story Mode</title>
+    <script src="story-game.js" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-800 text-white font-mono">
+    <div class="container mx-auto p-4 text-center">
+      <h1 class="text-3xl font-bold mb-4">The Revenge Of A Samurai</h1>
 
-    <!-- Game Display -->
-    <div id="game-container" class="relative mx-auto bg-gray-900 rounded-lg w-[800px] h-[600px]">
-      <canvas id="game-canvas" width="800" height="600"></canvas>
-    </div>
+      <!-- Game Display -->
+      <div
+        id="game-container"
+        class="relative mx-auto bg-gray-900 rounded-lg w-[800px] h-[600px]"
+      >
+        <canvas id="game-canvas" width="800" height="600"></canvas>
+      </div>
 
-
-
-    <div id="challenge-section" class="mt-4 bg-gray-700 p-4 rounded-lg hidden">
+      <div
+        id="challenge-section"
+        class="mt-4 bg-gray-700 p-4 rounded-lg hidden"
+      >
         <p id="challenge-text">A challenge awaits you. Choose wisely:</p>
-        <div id="choices" class="mt-2 space-x-2">
-          <!-- Choices will be dynamically added here -->
-        </div>
+        <div id="choices" class="mt-2 space-x-2"></div>
       </div>
-      
 
-      <div id="dialogue-box" class="absolute bottom-0 left-0 bg-gray-800 text-white p-4 w-full hidden">
-        <p id="dialogue-text"></p>
+      <div id="location-input-section" class="mt-4 bg-gray-700 p-4 rounded-lg hidden">
+        <p>Type the location you want to go to:</p>
+        <input
+          type="text"
+          id="location-input"
+          class="bg-gray-800 text-white p-2 rounded-lg"
+          placeholder="Enter location name"
+        />
+        <button
+          id="submit-location-btn"
+          class="bg-blue-600 hover:bg-blue-700 p-2 rounded-lg"
+        >
+          Go
+        </button>
+        <p id="location-error" class="text-red-500 hidden">Invalid location. Try again.</p>
       </div>
-      
 
+      <!-- NEW: Persistent Available Locations Section -->
+      <div id="available-locations" class="mt-4 bg-gray-700 p-4 rounded-lg">
+        <h2 class="text-xl font-bold mb-2">Available Locations:</h2>
+        <p id="available-locations-list" class="text-white"></p>
+      </div>
 
-    <!-- Interaction and Story -->
-    <div id="story-section" class="mt-4 bg-gray-700 p-4 rounded-lg">
-        <p id="story-text">Choose your starting location to begin your journey.</p>
+      <!-- Interaction and Story -->
+      <div id="story-section" class="mt-4 bg-gray-700 p-4 rounded-lg">
+        <p id="story-text">
+          Choose your starting location to begin your journey.
+        </p>
         <div id="actions" class="mt-2">
-          <button class="action-btn bg-blue-600 hover:bg-blue-700 p-2 rounded-lg hidden" id="move-btn">Move</button>
-          <button class="action-btn bg-green-600 hover:bg-green-700 p-2 rounded-lg hidden" id="interact-btn">Interact</button>
-          <button class="action-btn bg-red-600 hover:bg-red-700 p-2 rounded-lg" id="reset-btn">Reset</button>
+          <!-- Removed the move button, only Interact and Reset remain -->
+          <button
+            class="action-btn bg-green-600 hover:bg-green-700 p-2 rounded-lg hidden"
+            id="interact-btn"
+          >
+            Interact
+          </button>
+          <button
+            class="action-btn bg-red-600 hover:bg-red-700 p-2 rounded-lg"
+            id="reset-btn"
+          >
+            Reset
+          </button>
         </div>
-      </div>      
-  </div>
-</body>
+      </div>
+    </div>
+  </body>
 </html>
