@@ -18,14 +18,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Predefined positions for each location
   const locationPositions = {
-    castle: { x: 400, y: 300 },      // Center
-    village: { x: 600, y: 150 },     // Halfway top-right corner to castle
-    shrine: { x: 100, y: 100 },      // Original start point
-    harbor: { x: 200, y: 400 },      // Bottom-left of castle
-    forest: { x: 700, y: 450 },      // Near bottom-right corner, a bit higher
-    battlefield: { x: 350, y: 550 }, // Slightly left from bottom center
+    castle: { x: 400, y: 300 }, // Center
+    village: { x: 600, y: 150 }, // Halfway top-right corner to castle
+    shrine: { x: 100, y: 100 }, // Original start point
+    harbor: { x: 200, y: 400 }, // Bottom-left of castle
+    forest: { x: 700, y: 450 }, // Near bottom-right corner, a bit higher
+    battlefield: { x: 400, y: 500 }, // Slightly left from bottom center
   };
-  
 
   const initialState = {
     x: locationPositions.castle.x,
