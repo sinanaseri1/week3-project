@@ -14,31 +14,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const playerSprite = new Image();
 
-  // CHANGES MADE HERE: We'll delay setting playerSprite until character choice is made.
-
-  // Predefined positions for each location
+  // Positions updated as requested and mentioned previously
   const locationPositions = {
-    castle: { x: 400, y: 300 }, // Center
-    village: { x: 600, y: 150 }, // Halfway top-right corner to castle
-    shrine: { x: 100, y: 100 }, // Original start point
-    harbor: { x: 200, y: 400 }, // Bottom-left of castle
-    forest: { x: 700, y: 450 }, // Near bottom-right corner, a bit higher
-    battlefield: { x: 400, y: 500 }, // Slightly left from bottom center
+    // Castle at center of the map
+    castle: { x: 400, y: 300 },
+    // Village halfway between top-right corner and castle
+    village: { x: 600, y: 150 },
+    // Shrine at the original starting position
+    shrine: { x: 100, y: 100 },
+    // Harbor on the bottom-left of castle
+    harbor: { x: 200, y: 400 },
+    // Forest near the bottom-right corner, a bit higher
+    forest: { x: 700, y: 450 },
+    // Battlefield to the left and up from bottom center
+    battlefield: { x: 300, y: 500 },
   };
 
   const initialState = {
-    x: locationPositions.castle.x,
-    y: locationPositions.castle.y,
+    x: locationPositions.shrine.x,
+    y: locationPositions.shrine.y,
     width: 64,
     height: 64,
-    location: "castle",
+    location: "shrine",
     visitedLocations: [],
     status: "neutral",
   };
 
   let player = { ...initialState };
 
-  // Track completed challenges
+  // Challenges completion tracking
   let challengesCompleted = {
     castle: false,
     village: false,
@@ -48,86 +52,145 @@ document.addEventListener("DOMContentLoaded", () => {
     battlefield: false,
   };
 
-  // Variable to hold the celebration div so we can remove it on reset
   let celebrationDiv = null;
 
+  // Updated storyline and dialogues
   const locations = {
     castle: {
-      name: "Shogun's Castle",
-      description: "The seat of power, bustling with political intrigue.",
+      name: "Shogun’s Keep",
+      description:
+        "At the heart of the land stands the Shogun’s Keep. Its wooden halls and whispered counsel hide the fragility of the peace you have known. The Shogun, aging and troubled, awaits your audience.",
       connections: ["village", "harbor"],
       challenge: {
-        text: "A rival samurai challenges you to a duel. What will you do?",
+        text: "The Shogun paces before you, his gaze heavy with concern. 'A shadow looms,' he says. 'Rumors tell of the Blossom Blade, an artifact of unity. Prove your worth: will you pledge to restore harmony, or seek your own gains?'",
         choices: [
-          { text: "Kill", outcome: "lose" },
-          { text: "Spare", outcome: "progress" },
-          { text: "Befriend", outcome: "win" },
+          {
+            text: "Pledge Unwavering Loyalty (progress)",
+            outcome: "progress",
+          },
+          {
+            text: "Demand Favors and Riches (lose)",
+            outcome: "lose",
+          },
+          {
+            text: "Ask for Guidance, Not Glory (win)",
+            outcome: "win",
+          },
         ],
       },
     },
     village: {
       name: "Kiyama Village",
-      description: "A peaceful village with hidden secrets.",
+      description:
+        "Kiyama Village rests on terraced hills, its lantern-lit eaves sheltering wary folk. Bandit troubles and mistrust weigh heavily on its people.",
       connections: ["castle", "forest"],
       challenge: {
-        text: "A villager accuses you of theft. How will you respond?",
+        text: "A villager rushes to you, tears in her eyes. 'My family's heirloom is stolen! Some say you took it. Can you restore our faith?' The crowd watches, uncertain, fearful.",
         choices: [
-          { text: "Apologize", outcome: "progress" },
-          { text: "Ignore", outcome: "lose" },
-          { text: "Defend Yourself", outcome: "win" },
+          {
+            text: "Reveal the True Culprit With Diplomacy (win)",
+            outcome: "win",
+          },
+          {
+            text: "Offer Compensation From Your Own Pouch (progress)",
+            outcome: "progress",
+          },
+          {
+            text: "Dismiss Their Accusation Abruptly (lose)",
+            outcome: "lose",
+          },
         ],
       },
     },
     harbor: {
       name: "Kurokumo Harbor",
-      description: "A bustling harbor filled with merchants and intrigue.",
+      description:
+        "Kurokumo Harbor bustles with fishers and traders. Rumors flow here like tides, each whisper a chance to gain or lose trust.",
       connections: ["castle", "shrine"],
       challenge: {
-        text: "A merchant offers a mysterious map for a high price. What will you do?",
+        text: "A merchant leans in, voice low: 'I have a scrap of the Blossom Blade’s scabbard. For a price.' Others watch. Will you trade fairly or stoop to deceit?",
         choices: [
-          { text: "Buy the Map", outcome: "progress" },
-          { text: "Steal the Map", outcome: "lose" },
-          { text: "Negotiate", outcome: "win" },
+          {
+            text: "Negotiate Fairly and Secure the Scrap (win)",
+            outcome: "win",
+          },
+          {
+            text: "Barter Shrewdly, Saving Some Coin (progress)",
+            outcome: "progress",
+          },
+          {
+            text: "Attempt to Steal It (lose)",
+            outcome: "lose",
+          },
         ],
       },
     },
     forest: {
       name: "Bamboo Forest",
-      description: "A mysterious forest rumored to be haunted.",
+      description:
+        "The Bamboo Forest whispers with ancient spirits. Moonlight reveals carvings on aged stalks. Many who enter never return.",
       connections: ["village", "battlefield"],
       challenge: {
-        text: "A wandering spirit asks for your help. How will you respond?",
+        text: "A ghostly spirit drifts near, hollow voice echoing: 'Will you help our restless souls, or is your heart closed to our plight?'",
         choices: [
-          { text: "Fight", outcome: "lose" },
-          { text: "Ignore", outcome: "lose" },
-          { text: "Help", outcome: "win" },
+          {
+            text: "Offer Your Blade in Protection of the Spirits (win)",
+            outcome: "win",
+          },
+          {
+            text: "Acknowledge Their Pain But Remain Neutral (progress)",
+            outcome: "progress",
+          },
+          {
+            text: "Ignore Their Plea and Press On (lose)",
+            outcome: "lose",
+          },
         ],
       },
     },
     shrine: {
       name: "Mount Hikari Shrine",
       description:
-        "A serene mountaintop shrine. Pilgrims seek enlightenment here.",
+        "High on Mount Hikari, monks guard ancient wisdom. Wind chimes sing into the mist. Here, secrets of the Blossom Blade linger, waiting for a worthy soul.",
       connections: ["harbor"],
       challenge: {
-        text: "A monk offers you wisdom but asks for a favor in return. How will you respond?",
+        text: "A serene monk greets you: 'We know of the Blossom Blade. Prove your worth. Will you help with our rituals, seek immediate knowledge, or show patience through silent meditation?'",
         choices: [
-          { text: "Accept the Favor", outcome: "progress" },
-          { text: "Refuse", outcome: "lose" },
-          { text: "Seek Wisdom Without Favor", outcome: "win" },
+          {
+            text: "Offer Help With the Shrine’s Ritual (progress)",
+            outcome: "progress",
+          },
+          {
+            text: "Plead For Hidden Knowledge Immediately (lose)",
+            outcome: "lose",
+          },
+          {
+            text: "Meditate in Silence, Showing Patience (win)",
+            outcome: "win",
+          },
         ],
       },
     },
     battlefield: {
       name: "Crimson Battlefield",
-      description: "A desolate field haunted by the ghosts of war.",
+      description:
+        "A scarred land strewn with rusted arms and lost honor. The ghosts of old warriors whisper laments into the wind.",
       connections: ["forest"],
       challenge: {
-        text: "A ghostly warrior demands to know your purpose. How will you respond?",
+        text: "A ghostly warrior bars your path. 'For whom do you fight?' it demands. 'For peace, for power, or the souls who cannot rest?'",
         choices: [
-          { text: "Fight", outcome: "lose" },
-          { text: "Explain Yourself", outcome: "win" },
-          { text: "Run Away", outcome: "lose" },
+          {
+            text: "Explain Your Quest for Unity and Peace (win)",
+            outcome: "win",
+          },
+          {
+            text: "Boast of Your Strength and Skill (progress)",
+            outcome: "progress",
+          },
+          {
+            text: "Attempt to Flee Without Answering (lose)",
+            outcome: "lose",
+          },
         ],
       },
     },
@@ -152,7 +215,6 @@ document.addEventListener("DOMContentLoaded", () => {
     storyText.textContent = `You are at ${loc.name}. ${loc.description}`;
     moveBtn.classList.remove("hidden");
 
-    // Only show interact button if the challenge isn't completed yet
     if (challengesCompleted[location]) {
       interactBtn.classList.add("hidden");
     } else {
@@ -216,28 +278,25 @@ document.addEventListener("DOMContentLoaded", () => {
   function handleChoice(outcome) {
     if (outcome === "win") {
       storyText.textContent =
-        "You made the right choice and advanced in your journey!";
+        "Your choice reflects true merit. The path to the Blossom Blade grows clearer.";
       markChallengeCompleted(player.location);
     } else if (outcome === "progress") {
       storyText.textContent =
-        "You navigated the challenge successfully but more lies ahead.";
+        "You move forward, though not flawlessly. Still, the journey continues.";
       markChallengeCompleted(player.location);
     } else {
-      // Losing does not complete the challenge
       storyText.textContent =
-        "You made the wrong choice here. You can still travel and try again later.";
-      // Interact button stays visible since challenge not completed
+        "A poor choice. The path darkens, but you may yet redeem yourself elsewhere.";
+      // Not completed, interact button remains for retries
     }
 
     challengeSection.classList.add("hidden");
 
-    // After handling the choice, check if all challenges are completed
     checkWinCondition();
   }
 
   function markChallengeCompleted(location) {
     challengesCompleted[location] = true;
-    // Hide interact button at this location since it's completed
     interactBtn.classList.add("hidden");
   }
 
@@ -252,7 +311,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showCelebration() {
     storyText.textContent =
-      "Congratulations! You have completed all challenges!";
+      "Congratulations! You have proven your worth and united the lands under your wisdom and honor.";
     moveBtn.classList.add("hidden");
     interactBtn.classList.add("hidden");
 
@@ -269,14 +328,12 @@ document.addEventListener("DOMContentLoaded", () => {
     celebrationDiv.style.textAlign = "center";
     celebrationDiv.innerHTML = `
       <p>おめでとうございます！</p>
-      <p>You have brought great honor to your clan.</p>
+      <p>You have brought great honor to your clan and restored harmony to the realm. The Blossom Blade is now yours, shining as a beacon of peace.</p>
     `;
     document.body.appendChild(celebrationDiv);
   }
 
-  // CHANGES MADE HERE: Add a function to show character selection
   function showCharacterSelection() {
-    // Hide move and interact buttons until character chosen
     moveBtn.classList.add("hidden");
     interactBtn.classList.add("hidden");
 
@@ -288,19 +345,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("samurai-select").addEventListener("click", () => {
       playerSprite.src = "samurai.png";
-      startGame();
-    });
-
-    document.getElementById("ninja-select").addEventListener("click", () => {
-      playerSprite.src = "ninja.png";
-      startGame();
-    });
-
-    // ... inside showCharacterSelection function:
-
-    document.getElementById("samurai-select").addEventListener("click", () => {
-      playerSprite.src = "samurai.png";
-      // Wait for the sprite to load before starting the game
       playerSprite.onload = () => {
         startGame();
       };
@@ -308,14 +352,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("ninja-select").addEventListener("click", () => {
       playerSprite.src = "ninja.png";
-      // Wait for the sprite to load before starting the game
       playerSprite.onload = () => {
         startGame();
       };
     });
   }
 
-  // CHANGES MADE HERE: Start the game after choosing character
   function startGame() {
     updateStory(player.location);
     moveBtn.classList.remove("hidden");
@@ -334,15 +376,12 @@ document.addEventListener("DOMContentLoaded", () => {
       battlefield: false,
     };
 
-    // CHANGES MADE HERE: Remove celebration if present
     if (celebrationDiv) {
       celebrationDiv.remove();
       celebrationDiv = null;
     }
 
-    // Also reset playerSprite source to force character re-selection
     playerSprite.src = "";
-
     showCharacterSelection();
     draw();
   }
@@ -352,7 +391,6 @@ document.addEventListener("DOMContentLoaded", () => {
   resetBtn.addEventListener("click", resetGame);
 
   mapImage.onload = () => {
-    // CHANGES MADE HERE: Show character selection on initial load
     showCharacterSelection();
     draw();
   };
