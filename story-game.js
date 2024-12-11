@@ -13,21 +13,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const submitLocationBtn = document.getElementById("submit-location-btn");
   const locationError = document.getElementById("location-error");
 
-  const availableLocationsBox = document.getElementById("available-locations");
   const availableLocationsList = document.getElementById("available-locations-list");
-
   const progressText = document.getElementById("progress-text");
+  const moralityText = document.getElementById("morality-text");
 
   const mapImage = new Image();
   mapImage.src = "map.png";
 
   const playerSprite = new Image();
 
-  // Background Music
   const bgMusic = document.getElementById("bg-music");
   bgMusic.volume = 0.5;
 
-  // Morality Score: tracks the player's moral compass
+  // Track morality score
   let moralityScore = 0;
 
   const locationPositions = {
@@ -80,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     harbor: {
       name: "Kurokumo Harbor",
-      description: "Ships creak under faded sails. Rumor has it the assassin fled by sea...",
+      description: "Ships creak under faded sails...",
       connections: ["castle", "shrine"],
       challenge: {
         text: "A weathered merchant eyes you: 'The killer sailed from here...'",
@@ -109,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
       description: "This quiet place remembers the assassin...",
       connections: ["castle", "forest"],
       challenge: {
-        text: "A fearful villager clutches a pendant: 'The killer cried by our well...'",
+        text: "A fearful villager: 'The killer cried by our well...'",
         choices: [
           { text: "Offer Comfort (win)", outcome: "win" },
           { text: "Pay for Silence (progress)", outcome: "progress" },
@@ -197,6 +195,10 @@ document.addEventListener("DOMContentLoaded", () => {
     progressText.textContent = `Clues Found: ${completedCount}/${allMainLocations.length}`;
   }
 
+  function updateMorality() {
+    moralityText.textContent = `Morality: ${moralityScore}`;
+  }
+
   function showLocationInputIfNeeded(loc) {
     const connections = loc.connections;
     if (connections.length === 0) {
@@ -217,7 +219,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (validLocation) {
         locationError.classList.add("hidden");
-        // Highlight in green briefly
         locationInput.classList.remove("border-red-500");
         locationInput.classList.add("border-green-500");
         handleMove(validLocation);
@@ -282,12 +283,13 @@ document.addEventListener("DOMContentLoaded", () => {
         markChallengeCompleted(player.location);
       } else if (outcome === "progress") {
         moralityScore += 1; // neutral
-        storyText.textContent = "You glean partial insight, though uncertainty lingers.";
+        storyText.textContent = "You glean partial insight, uncertainty lingers.";
         markChallengeCompleted(player.location);
       } else {
         moralityScore -= 1; // negative action
-        storyText.textContent = "You fail to secure the clue, and your heart grows heavier.";
+        storyText.textContent = "You fail to secure the clue, your heart grows heavier.";
       }
+      updateMorality();
       challengeSection.classList.add("hidden");
       checkWinCondition();
     } else {
@@ -301,6 +303,7 @@ document.addEventListener("DOMContentLoaded", () => {
           storyText.textContent = "You disarm the assassin. He kneels. Now choose his fate.";
         }
         markChallengeCompleted("finalboss");
+        updateMorality();
         locationInputSection.classList.add("hidden");
         interactBtn.classList.add("hidden");
         showFinalChoice();
@@ -406,6 +409,8 @@ document.addEventListener("DOMContentLoaded", () => {
     availableLocationsList.textContent = "";
     locationInputSection.classList.add("hidden");
     progressText.textContent = "Clues Found: 0/6";
+    moralityScore = 0;
+    updateMorality();
 
     storyText.innerHTML = `
       <p>You are the heir of a murdered king. Choose your path:</p>
@@ -429,10 +434,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function startGame() {
-    // Try to play background music when the game starts
-    bgMusic.play().catch(() => {
-      // If blocked, user will have to interact with the page first (e.g., click somewhere)
-    });
+    bgMusic.play().catch(() => {});
     interactBtn.classList.remove("hidden");
     updateStory(player.location);
     draw();
@@ -450,6 +452,7 @@ document.addEventListener("DOMContentLoaded", () => {
       finalboss: false,
     };
     moralityScore = 0;
+    updateMorality();
 
     const fbIndex = locations.battlefield.connections.indexOf("finalboss");
     if (fbIndex !== -1) {
