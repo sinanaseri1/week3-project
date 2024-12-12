@@ -2,16 +2,20 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Samurai Adventure - Story Mode</title>
-    <script src="story-game.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load modules in order: constants, data, ui, gameLogic, then main -->
+    <script src="constants.js" type="module"></script>
+    <script src="data.js" type="module"></script>
+    <script src="ui.js" type="module"></script>
+    <script src="gameLogic.js" type="module"></script>
+    <script src="main.js" type="module"></script>
   </head>
   <body class="bg-gray-800 text-white font-mono">
     <div class="container mx-auto p-4 text-center">
       <h1 class="text-3xl font-bold mb-4">The Revenge Of A Samurai</h1>
 
-      <!-- Game Display -->
       <div
         id="game-container"
         class="relative mx-auto bg-gray-900 rounded-lg w-[800px] h-[600px]"
@@ -27,7 +31,10 @@
         <div id="choices" class="mt-2 space-x-2"></div>
       </div>
 
-      <div id="location-input-section" class="mt-4 bg-gray-700 p-4 rounded-lg hidden">
+      <div
+        id="location-input-section"
+        class="mt-4 bg-gray-700 p-4 rounded-lg hidden"
+      >
         <p>Type the location you want to go to:</p>
         <input
           type="text"
@@ -41,28 +48,26 @@
         >
           Go
         </button>
-        <p id="location-error" class="text-red-500 hidden">Invalid location. Try again.</p>
+        <p id="location-error" class="text-red-500 hidden">
+          Invalid location. Try again.
+        </p>
       </div>
 
-      <!-- Persistent Available Locations Section -->
       <div id="available-locations" class="mt-4 bg-gray-700 p-4 rounded-lg">
         <h2 class="text-xl font-bold mb-2">Available Locations:</h2>
         <p id="available-locations-list" class="text-white"></p>
       </div>
 
-      <!-- Progress Section for Clues -->
       <div id="progress-section" class="mt-4 bg-gray-700 p-4 rounded-lg">
         <h2 class="text-xl font-bold mb-2">Progress:</h2>
         <p id="progress-text">Clues Found: 0/6</p>
       </div>
 
-      <!-- Morality Score Section -->
       <div id="morality-section" class="mt-4 bg-gray-700 p-4 rounded-lg">
         <h2 class="text-xl font-bold mb-2">Morality:</h2>
         <p id="morality-text">Morality: 0</p>
       </div>
 
-      <!-- Interaction and Story -->
       <div id="story-section" class="mt-4 bg-gray-700 p-4 rounded-lg">
         <p id="story-text">
           Choose your starting location to begin your journey.
@@ -83,7 +88,6 @@
         </div>
       </div>
 
-      <!-- Background Music -->
       <audio id="bg-music" src="ambient.mp3" loop></audio>
     </div>
   </body>
