@@ -8,26 +8,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const challengeText = document.getElementById("challenge-text");
   const choicesContainer = document.getElementById("choices");
 
-  const locationInputSection = document.getElementById("location-input-section");
+  const locationInputSection = document.getElementById(
+    "location-input-section"
+  );
   const locationInput = document.getElementById("location-input");
   const submitLocationBtn = document.getElementById("submit-location-btn");
   const locationError = document.getElementById("location-error");
 
-  const availableLocationsBox = document.getElementById("available-locations");
-  const availableLocationsList = document.getElementById("available-locations-list");
-
+  const availableLocationsList = document.getElementById(
+    "available-locations-list"
+  );
   const progressText = document.getElementById("progress-text");
+  const moralityText = document.getElementById("morality-text");
 
   const mapImage = new Image();
   mapImage.src = "map.png";
 
   const playerSprite = new Image();
 
-  // Background Music
   const bgMusic = document.getElementById("bg-music");
   bgMusic.volume = 0.5;
 
-  // Morality Score: tracks the player's moral compass
+  // Track morality score
   let moralityScore = 0;
 
   const locationPositions = {
@@ -67,20 +69,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const locations = {
     shrine: {
       name: "Crumbling Shrine",
-      description: "Long ago, your father’s kingdom touched these sacred grounds...",
+      description:
+        "Long ago, your father’s kingdom touched these sacred grounds...",
       connections: ["harbor"],
       challenge: {
         text: "A trembling monk speaks: 'I saw a hooded figure after your father was murdered...'",
         choices: [
           { text: "Kneel and Pray for Guidance (win)", outcome: "win" },
-          { text: "Offer Coin for Information (progress)", outcome: "progress" },
+          {
+            text: "Offer Coin for Information (progress)",
+            outcome: "progress",
+          },
           { text: "Threaten the Monk (lose)", outcome: "lose" },
         ],
       },
     },
     harbor: {
       name: "Kurokumo Harbor",
-      description: "Ships creak under faded sails. Rumor has it the assassin fled by sea...",
+      description: "Ships creak under faded sails...",
       connections: ["castle", "shrine"],
       challenge: {
         text: "A weathered merchant eyes you: 'The killer sailed from here...'",
@@ -109,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
       description: "This quiet place remembers the assassin...",
       connections: ["castle", "forest"],
       challenge: {
-        text: "A fearful villager clutches a pendant: 'The killer cried by our well...'",
+        text: "A fearful villager: 'The killer cried by our well...'",
         choices: [
           { text: "Offer Comfort (win)", outcome: "win" },
           { text: "Pay for Silence (progress)", outcome: "progress" },
@@ -162,7 +168,13 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(mapImage, 0, 0, canvas.width, canvas.height);
     if (playerSprite.src) {
-      ctx.drawImage(playerSprite, player.x, player.y, player.width, player.height);
+      ctx.drawImage(
+        playerSprite,
+        player.x,
+        player.y,
+        player.width,
+        player.height
+      );
     }
   }
 
@@ -184,7 +196,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateAvailableLocations(loc) {
     const connections = loc.connections;
     if (connections.length === 0) {
-      availableLocationsList.textContent = "No further locations available from here.";
+      availableLocationsList.textContent =
+        "No further locations available from here.";
     } else {
       const names = connections.map((c) => locations[c].name).join(", ");
       availableLocationsList.textContent = names;
@@ -192,9 +205,22 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateProgress() {
-    const allMainLocations = ["castle", "village", "harbor", "forest", "shrine", "battlefield"];
-    const completedCount = allMainLocations.filter(loc => challengesCompleted[loc]).length;
+    const allMainLocations = [
+      "castle",
+      "village",
+      "harbor",
+      "forest",
+      "shrine",
+      "battlefield",
+    ];
+    const completedCount = allMainLocations.filter(
+      (loc) => challengesCompleted[loc]
+    ).length;
     progressText.textContent = `Clues Found: ${completedCount}/${allMainLocations.length}`;
+  }
+
+  function updateMorality() {
+    moralityText.textContent = `Morality: ${moralityScore}`;
   }
 
   function showLocationInputIfNeeded(loc) {
@@ -217,7 +243,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (validLocation) {
         locationError.classList.add("hidden");
-        // Highlight in green briefly
         locationInput.classList.remove("border-red-500");
         locationInput.classList.add("border-green-500");
         handleMove(validLocation);
@@ -266,7 +291,8 @@ document.addEventListener("DOMContentLoaded", () => {
     challenge.choices.forEach((choice) => {
       const btn = document.createElement("button");
       btn.textContent = choice.text;
-      btn.className = "bg-green-600 hover:bg-green-700 p-2 rounded-lg mx-2 choice-btn";
+      btn.className =
+        "bg-green-600 hover:bg-green-700 p-2 rounded-lg mx-2 choice-btn";
       btn.addEventListener("click", () => handleChoice(choice.outcome));
       choicesContainer.appendChild(btn);
     });
@@ -278,34 +304,43 @@ document.addEventListener("DOMContentLoaded", () => {
     if (player.location !== "finalboss") {
       if (outcome === "win") {
         moralityScore += 2; // good deed
-        storyText.textContent = "You gain a vital clue, and feel a sense of honor.";
+        storyText.textContent =
+          "You gain a vital clue, and feel a sense of honor.";
         markChallengeCompleted(player.location);
       } else if (outcome === "progress") {
         moralityScore += 1; // neutral
-        storyText.textContent = "You glean partial insight, though uncertainty lingers.";
+        storyText.textContent =
+          "You glean partial insight, uncertainty lingers.";
         markChallengeCompleted(player.location);
       } else {
         moralityScore -= 1; // negative action
-        storyText.textContent = "You fail to secure the clue, and your heart grows heavier.";
+        storyText.textContent =
+          "You fail to secure the clue, your heart grows heavier.";
       }
+      updateMorality();
       challengeSection.classList.add("hidden");
       checkWinCondition();
     } else {
       // Final boss scenario
       if (outcome === "win" || outcome === "progress") {
         if (moralityScore > 5) {
-          storyText.textContent = "Your compassion shines even now, disarming the assassin with honor. Now choose his fate.";
+          storyText.textContent =
+            "Your compassion shines even now, disarming the assassin with honor. Now choose his fate.";
         } else if (moralityScore < 0) {
-          storyText.textContent = "Though you disarm him, the darkness in your deeds taints this victory. Choose his fate.";
+          storyText.textContent =
+            "Though you disarm him, the darkness in your deeds taints this victory. Choose his fate.";
         } else {
-          storyText.textContent = "You disarm the assassin. He kneels. Now choose his fate.";
+          storyText.textContent =
+            "You disarm the assassin. He kneels. Now choose his fate.";
         }
         markChallengeCompleted("finalboss");
+        updateMorality();
         locationInputSection.classList.add("hidden");
         interactBtn.classList.add("hidden");
         showFinalChoice();
       } else {
-        storyText.textContent = "Your hesitation proves fatal. The assassin strikes you down.";
+        storyText.textContent =
+          "Your hesitation proves fatal. The assassin strikes you down.";
         interactBtn.classList.add("hidden");
         challengeSection.classList.add("hidden");
         locationInputSection.classList.add("hidden");
@@ -320,13 +355,23 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function checkWinCondition() {
-    const allMainLocations = ["castle", "village", "harbor", "forest", "shrine", "battlefield"];
-    const allMainCompleted = allMainLocations.every((loc) => challengesCompleted[loc]);
+    const allMainLocations = [
+      "castle",
+      "village",
+      "harbor",
+      "forest",
+      "shrine",
+      "battlefield",
+    ];
+    const allMainCompleted = allMainLocations.every(
+      (loc) => challengesCompleted[loc]
+    );
 
     if (allMainCompleted && !challengesCompleted.finalboss) {
       if (!locations.battlefield.connections.includes("finalboss")) {
         locations.battlefield.connections.push("finalboss");
-        storyText.textContent = "All clues gathered! Return to the Battlefield to face the assassin.";
+        storyText.textContent =
+          "All clues gathered! Return to the Battlefield to face the assassin.";
         updateAvailableLocations(locations[player.location]);
       }
     }
@@ -346,7 +391,8 @@ document.addEventListener("DOMContentLoaded", () => {
     finalChoices.forEach((choice) => {
       const btn = document.createElement("button");
       btn.textContent = choice.text;
-      btn.className = "bg-green-600 hover:bg-green-700 p-2 rounded-lg mx-2 choice-btn";
+      btn.className =
+        "bg-green-600 hover:bg-green-700 p-2 rounded-lg mx-2 choice-btn";
       btn.addEventListener("click", () => handleFinalChoice(choice.outcome));
       choicesContainer.appendChild(btn);
     });
@@ -357,7 +403,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let finalMessage = "";
     if (outcome === "kill") {
-      finalMessage = "You deliver the final blow. The cycle of violence continues.";
+      finalMessage =
+        "You deliver the final blow. The cycle of violence continues.";
     } else if (outcome === "spare") {
       if (moralityScore > 5) {
         finalMessage = "You spare him, your mercy a beacon of hope.";
@@ -365,7 +412,8 @@ document.addEventListener("DOMContentLoaded", () => {
         finalMessage = "You spare him, uncertain if this will heal old wounds.";
       }
     } else {
-      finalMessage = "You bind his hands. Justice, not vengeance, will guide the future.";
+      finalMessage =
+        "You bind his hands. Justice, not vengeance, will guide the future.";
     }
 
     storyText.textContent = finalMessage;
@@ -406,6 +454,8 @@ document.addEventListener("DOMContentLoaded", () => {
     availableLocationsList.textContent = "";
     locationInputSection.classList.add("hidden");
     progressText.textContent = "Clues Found: 0/6";
+    moralityScore = 0;
+    updateMorality();
 
     storyText.innerHTML = `
       <p>You are the heir of a murdered king. Choose your path:</p>
@@ -429,10 +479,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function startGame() {
-    // Try to play background music when the game starts
-    bgMusic.play().catch(() => {
-      // If blocked, user will have to interact with the page first (e.g., click somewhere)
-    });
+    bgMusic.play().catch(() => {});
     interactBtn.classList.remove("hidden");
     updateStory(player.location);
     draw();
@@ -450,6 +497,7 @@ document.addEventListener("DOMContentLoaded", () => {
       finalboss: false,
     };
     moralityScore = 0;
+    updateMorality();
 
     const fbIndex = locations.battlefield.connections.indexOf("finalboss");
     if (fbIndex !== -1) {
