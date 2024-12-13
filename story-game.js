@@ -41,8 +41,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const initialState = {
     x: locationPositions.shrine.x,
     y: locationPositions.shrine.y,
-    width: 64,
-    height: 64,
+    width: 100,
+    height: 100,
     location: "shrine",
     visitedLocations: [],
   };
