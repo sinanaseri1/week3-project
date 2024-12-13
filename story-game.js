@@ -410,7 +410,7 @@ document.addEventListener("DOMContentLoaded", () => {
     interactBtn.classList.add("hidden");
     availableLocationsList.textContent = "";
     locationInputSection.classList.add("hidden");
-    progressText.textContent = "Clues Found: 0/6";
+    progressText.textContent = " 0/6";
     moralityScore = 0;
     updateMorality();
 
